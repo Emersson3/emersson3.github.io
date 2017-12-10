@@ -1,13 +1,19 @@
-// JavaScript Document
+/* Leffoja-sivuston JavaScript-ohjelmakoodi:
+Ohjelmalla haetaan kaikki Finnkinon nykyhetkessä tarjonnassa olevat elokuvat ja tapahtumat paikkakunta- sekä teatterikohtaisesti. Sivultamme löydät kaikkien tarjonnassa olevien elokuvien tarkempia tietoja, kuten julkaisuvuoden ja alkuperäisen nimen.
+Ohjelma käyttää Finnkinon XML-REST API-rajapintaa, josta dataa haetaan XML-muodossa, ja parsitaan AJAX-kutsujen avulla JavaScript-objektiksi.
+Otin sivustoon käyttöön BootStrap-frameworkin ulkoasua varten, koska se on mielestäni niin hyvä ja yksinkertainen ottaa käyttöön. */
 
+// Asetetaan sivun latautuessa taustakuva.
 function vaihdaTausta() {
 			var bg = 'film.jpg';
 			$('body').css('background','#000 url('+bg+') no-repeat center center fixed');
 		}
 
+		// Pudotusvalikon arvon vaihtuessa kutsutaan tätä funktiota, joka hakee elokuvadataa.
 		function loadXMLDoc(selectObject) {
 	var value = selectObject.value;
     var url = "";
+	// Tarkistetaan pudotusvalikon arvoa. Tämä voitaisiin varmasti tehdä järkevämminkin. Tässä on menty hieman "quick and dirty"-tavalla.
 	if (value == "Helsinki: Kinopalatsi") {
 		url = "https://www.finnkino.fi/xml/Events/?area=1031";
 	} else if (value == "Helsinki: Tennispalatsi") {
@@ -39,12 +45,16 @@ function vaihdaTausta() {
 	} else {
 		url = "";
 	}
+	// Tehdään kutsu XML-objektille.
 	var xmlhttp = new XMLHttpRequest();
 	xmlhttp.open("GET", url, true);
 	xmlhttp.send();
 	
+	// Jos kaikki on "okei", mennään eteenpäin
 	xmlhttp.onreadystatechange = function() {
 		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			/* Luodaan dynaamisesti uusi taulukko elokuvan dataa varten BootStrap-tyyleillä varustettuna.
+			Haetaan dataa. */
 			var out = '<table class="table table-hover table-bordered">';
 			var vastaus = xmlhttp.responseXML;
 			var titles = vastaus.getElementsByTagName("OriginalTitle");
@@ -57,8 +67,10 @@ function vaihdaTausta() {
 			console.log(kuvaparent);
 			console.log(titles);
 			console.log(linkit);
+			// Dynaamisesti lisätään sarakkeita ja rivejä taulukkoon.
 			out += '<thead class="thead-light">';
 			out += '<tr>';
+			// Luon dynaamisesti taulukolle otsikot BootStrap-tyyleillä
 			out += '<th>' + 'Elokuvan nimi' + '</th>';
 			out += '<th>' + 'Finnkinon linkki elokuvaan' + '</th>';
 			out += '<th>' + 'Kuva elokuvasta' + '</th>';
@@ -68,10 +80,13 @@ function vaihdaTausta() {
 			out += '</tr>';
 			out += '</thead>';
 			out += '<tbody>';
+			
+			// Lastataan haettu data objekteina tekemäämme taulukkoon. Looppi käy kaikki XML-tuloksen title-tagit läpi.
 			for (i=0; i < titles.length; i++) {
 				out += '<tr>';
 				out += '<td>' + titles[i].innerHTML + '</td>';
 				out += '<td>' + '<a href="' + linkit[i].innerHTML + '">' + 'Siirry elokuvan tietoihin' + '</></td>';
+				// Yritin saada kuvista jotenkin paremman näköisiä ja suurempia, mutta tämä oli ainoa keino, miten sain ne oikeasti toimimaan.
 				out += '<td><img src="' + kuvaparent[i].childNodes[1].innerHTML + '"</td>';
 				out += '<td>' + genres[i].innerHTML + '</td>';
 				out += '<td>' + synopsis[i].innerHTML + '</td>';
@@ -82,11 +97,17 @@ function vaihdaTausta() {
 			out += "</tbody>";
 			out += "</table>";
 			
+			// Täytetään taulukon sisältö haetulla datalla.
 			document.getElementById("tabledata").innerHTML = out;
+		}
+		
+		else {
+			console.log("Oops! Something must have went wrong..")
 		}
 	}
 }
-		
+		// Tämä funktio toteuttaa hakukentän toiminnallisuuden. Haulla voi hakea paikkakuntakohtaisesti dataa. Erilaiset kustomoidut hakuqueryt tuottivat sen verran ongelmia ja harmaita hiuksia, joten päädyin tällaiseen yksinkertaisempaan toteutukseen. 
+		// Funktio toimii käytännössä samalla tavalla kuin pudotusvalikon funktio, mutta muutamilla eroavaisuuksilla.
 		function searchMovieData() {
 			var value2 = document.getElementById("query").value;
 			var url = "";
@@ -171,6 +192,10 @@ function vaihdaTausta() {
 			out += "</table>";
 			
 			document.getElementById("tabledata").innerHTML = out;
+		}
+		
+		else {
+			console.log("Oops! Something must have went wrong..")
 		}
 	}
 }
