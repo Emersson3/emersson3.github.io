@@ -1,0 +1,366 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+  <link rel="icon" href="finnkino-01.png">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+  <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<title>Leffat</title>
+	
+<style type="text/css">
+
+	body {
+		font-family: 'Montserrat', sans-serif;
+	}
+	
+	html {
+  		position: relative;
+  		min-height: 100%;
+		-webkit-background-size: cover;
+  		-moz-background-size: cover;
+  		-o-background-size: cover;
+  		background-size: cover;
+	}
+	
+	div {
+		margin-top: 2%;
+	}
+	
+	#search-form, .form-control {
+    	margin-bottom: 20px;
+	}
+	
+	img {
+		-width: 100px;
+		-height: 175px;
+	}
+	
+	h1 {
+		color: dodgerblue;
+		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	}
+		
+	a {
+		
+	}
+	
+	.container {
+		
+		background: rgba(231,231,231,0.8);
+		border-radius: 15px;
+	}
+	
+	.jumbotron {
+		background: rgba(231,231,231,0);
+		border-radius: 15px;
+	}
+	
+	.footer {
+  		position: relative;
+  		bottom: 0;
+  		width: 100%;
+  		/* Set the fixed height of the footer here */
+  		height: 225px;
+  		line-height: 60px; /* Vertically center the text there */
+  		background-color: #2E2E2E;
+		
+	}
+	
+	#elokuvaSelect {
+		margin-bottom: 10px;
+		overflow:hidden;
+   width:350px;
+   -moz-border-radius: 5px 5px 5px 5px;
+   -webkit-border-radius: 5px 5px 5px 5px;
+   border-radius: 5px 5px 5px 5px;
+   background: #EFEFEF no-repeat scroll 319px center;
+	}
+	
+	#elokuvaSelect select {
+		border: 0;
+   color: #EEE;
+   background: transparent;
+   font-size: 20px;
+   padding: 2px 10px;
+   width: 378px;
+   *width: 350px;
+   *background: #58B14C;
+   -webkit-appearance: none;
+	}
+	
+	#loppu {
+		background: rgba(231,231,231,0.8);
+	}
+		
+	#elokuvat {
+		padding: 20px;	
+	}
+	
+	button {
+		margin-bottom: 10px;
+	}
+	
+	button:hover, select:hover {
+		cursor: pointer;
+	}
+	
+    </style>
+	
+	<script>
+		
+		function vaihdaTausta() {
+			var bg = 'film.jpg';
+			$('body').css('background','#000 url('+bg+') no-repeat center center fixed');
+		}
+
+		function loadXMLDoc(selectObject) {
+	var value = selectObject.value;
+    var url = "";
+	if (value == "Helsinki: Kinopalatsi") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1031";
+	} else if (value == "Helsinki: Tennispalatsi") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1033";
+	} else if (value == "Espoo: Omena") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1039";
+	} else if (value == "Espoo: Sello") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1038";
+	} else if (value == "Vantaa") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1013";
+	} else if (value == "Jyväskylä") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1015";
+	} else if (value == "Kuopio") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1016";
+	} else if (value == "Lahti") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1017";
+	} else if (value == "Lappeenranta") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1041";
+	} else if (value == "Oulu") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1018";
+	} else if (value == "Pori") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1019";
+	} else if (value == "Tampere: Cine Atlas") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1034";
+	} else if (value == "Tampere: Plevna") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1035";
+	} else if (value == "Turku") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1022";
+	} else {
+		url = "";
+	}
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.open("GET", url, true);
+	xmlhttp.send();
+	
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			var out = '<table class="table table-hover table-bordered">';
+			var vastaus = xmlhttp.responseXML;
+			var titles = vastaus.getElementsByTagName("OriginalTitle");
+			var kuvaparent = vastaus.getElementsByTagName("Images");
+			var genres = vastaus.getElementsByTagName("Genres");
+			var synopsis = vastaus.getElementsByTagName("ShortSynopsis");
+			var julkaisuv = vastaus.getElementsByTagName("ProductionYear");
+			var linkit = vastaus.getElementsByTagName("EventURL");
+			
+			console.log(kuvaparent);
+			console.log(titles);
+			console.log(linkit);
+			out += '<thead class="thead-light">';
+			out += '<tr>';
+			out += '<th>' + 'Elokuvan nimi' + '</th>';
+			out += '<th>' + 'Finnkinon linkki elokuvaan' + '</th>';
+			out += '<th>' + 'Kuva elokuvasta' + '</th>';
+			out += '<th>' + 'Kategoria' + '</th>';
+			out += '<th>' + 'Lyhyt synopsis' + '</th>';
+			out += '<th>' + 'Julkaisuvuosi' + '</th>';
+			out += '</tr>';
+			out += '</thead>';
+			out += '<tbody>';
+			for (i=0; i < titles.length; i++) {
+				out += '<tr>';
+				out += '<td>' + titles[i].innerHTML + '</td>';
+				out += '<td>' + '<a href="' + linkit[i].innerHTML + '">' + 'Siirry elokuvan tietoihin' + '</></td>';
+				out += '<td><img src="' + kuvaparent[i].childNodes[1].innerHTML + '"</td>';
+				out += '<td>' + genres[i].innerHTML + '</td>';
+				out += '<td>' + synopsis[i].innerHTML + '</td>';
+				out += '<td>' + julkaisuv[i].innerHTML + '</td>';
+				out += '</tr>';
+			}
+			
+			out += "</tbody>";
+			out += "</table>";
+			
+			document.getElementById("tabledata").innerHTML = out;
+		}
+	}
+}
+		
+		function searchMovieData() {
+			var value2 = document.getElementById("query").value;
+			var url = "";
+	if (value2 == "Kinopalatsi") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1031";
+	} else if (value2 == "Tennispalatsi") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1033";
+	} else if (value2 == "Espoo") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1012";
+	} else if (value2 == "Helsinki") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1002";
+	} else if (value2 == "Omena") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1039";
+	} else if (value2 == "Sello") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1038";
+	} else if (value2 == "Vantaa") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1013";
+	} else if (value2 == "Jyväskylä") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1015";
+	} else if (value2 == "Kuopio") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1016";
+	} else if (value2 == "Lahti") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1017";
+	} else if (value2 == "Lappeenranta") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1041";
+	} else if (value2 == "Oulu") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1018";
+	} else if (value2 == "Pori") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1019";
+	} else if (value2 == "Cine Atlas") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1034";
+	} else if (value2 == "Plevna") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1035";
+	} else if (value2 == "Tampere") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1021";
+	} else if (value2 == "Turku") {
+		url = "https://www.finnkino.fi/xml/Events/?area=1022";
+	} else {
+		url = "";
+	}
+			
+			var xmlhttp = new XMLHttpRequest();
+			xmlhttp.open("GET", url, true);
+			xmlhttp.send();
+	
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			var out = '<table class="table table-hover table-bordered">';
+			var kuvat = "";
+			var vastaus = xmlhttp.responseXML;
+			var titles = vastaus.getElementsByTagName("OriginalTitle");
+			var kuvat = vastaus.getElementsByTagName("EventLargeImagePortrait");
+			var kuvaparent = vastaus.getElementsByTagName("Images");
+			var genres = vastaus.getElementsByTagName("Genres");
+			var synopsis = vastaus.getElementsByTagName("ShortSynopsis");
+			var julkaisuv = vastaus.getElementsByTagName("ProductionYear");
+			
+			console.log(kuvat);
+			console.log(kuvaparent);
+			console.log(titles);
+			out += '<thead class="thead-dark">';
+			out += '<tr>';
+			out += '<th>' + 'Elokuvan nimi' + '</th>';
+			out += '<th>' + 'Kuva elokuvasta' + '</th>';
+			out += '<th>' + 'Kategoria' + '</th>';
+			out += '<th>' + 'Lyhyt synopsis' + '</th>';
+			out += '<th>' + 'Julkaisuvuosi' + '</th>';
+			out += '</tr>';
+			out += '</thead>';
+			out += '<tbody>';
+			for (i=0; i < titles.length; i++) {
+				out += '<tr>';
+				out += '<td>' + titles[i].innerHTML + '</td>';
+				out += '<td><img src="' + kuvaparent[i].childNodes[1].innerHTML + '"</td>';
+				out += '<td>' + genres[i].innerHTML + '</td>';
+				out += '<td>' + synopsis[i].innerHTML + '</td>';
+				out += '<td>' + julkaisuv[i].innerHTML + '</td>';
+				out += '</tr>';
+			}
+			
+			out += "</tbody>";
+			out += "</table>";
+			
+			document.getElementById("tabledata").innerHTML = out;
+		}
+	}
+}
+	</script>
+</head>
+
+<body onLoad="vaihdaTausta()">
+	<nav class="navbar navbar-expand-sm navbar-dark bg-info sticky-top">
+  <a class="navbar-brand" href="#">Sivun alkuun</a>
+</nav>
+	<div class="container">
+	<div class="jumbotron">
+  <h1>Leffat - Elokuvia Sinulle</h1>
+		<p>Käytämme Finnkinon XML-REST API-palvelua, jonka kautta haemme sinulle elokuvia, jotka pyörivät tällä hetkellä Finnkinon elokuvateattereissa. Sivultamme löydät kaikkien tarjonnassa olevien elokuvien tarkempia tietoja, kuten julkaisuvuoden ja alkuperäisen nimen.</p>
+  		<p>Valitse pudotusvalikosta haluamasi teatteri, niin näytämme sinulle kyseisen teatterin tarjontaa reaaliaikaisesti.</p> 
+</div>
+	</div>
+		<div class="container" id="elokuvat">
+    	<h1>Leffahaku</h1>
+		<p>Valitse teatteri pudotusvalikosta.</p>
+    	<select class="form-control bg-light" name="mySelect" id="elokuvaSelect" onchange="loadXMLDoc(this)">
+    	<option value="Helsinki: Kinopalatsi">Helsinki: Kinopalatsi</option>
+    	<option value="Helsinki: Tennispalatsi">Helsinki: Tennispalatsi</option>
+    	<option value="Espoo: Omena">Espoo: Omena</option>
+    	<option value="Espoo: Sello">Espoo: Sello</option>
+		<option value="Vantaa">Vantaa</option>
+		<option value="Jyväskylä">Jyväskylä</option>
+		<option value="Kuopio">Kuopio</option>
+		<option value="Lahti">Lahti</option>
+		<option value="Lappeenranta">Lappeenranta</option>
+		<option value="Oulu">Oulu</option>
+		<option value="Pori">Pori</option>
+		<option value="Tampere: Cine Atlas">Tampere: Cine Atlas</option>
+		<option value="Tampere: Plevna">Tampere: Plevna</option>
+		<option value="Turku">Turku</option>
+  </select>
+    <p>Voit myös etsiä tarkemmin syöttämällä hakusanoja tähän tekstikenttään.</p>
+    <form id="search-form">
+        <input type="text" id="query" class="form-control" placeholder="Kirjoita tähän." data-toggle="tooltip" data-placement="top" title="Hooray!"/>
+		<button type="button" id="search" class="btn btn-primary" onClick="searchMovieData()" value="Etsi!">Etsi!</button>
+    </form>
+    <div id="results"></div>
+	</div>
+<div class="container">
+<div class="table-responsive" id="tabledata">
+</div>
+</div>
+	
+<!--<footer class="footer">
+      <div class="container-fluid">
+        <span class="text-muted">Tässä on sivun alareuna.</span>
+      </div>
+    </footer>-->
+	
+<nav id="loppu" class="navbar navbar-expand-sm bg-info navbar-dark fixed-bottom">
+  <a class="navbar-brand" href="#">(©) Eemi Närhi - Valtteri Saariaro | eemi.narhi@student.laurea.fi | valtteri.saariaro@student.laurea.fi</a>
+</nav>
+
+	<script>
+	
+	$(function(){
+    	$('[data-toggle="tooltip"]').tooltip();   
+	})
+		
+	document.getElementById("query").onkeypress = function(e){
+    if (!e) e = window.event;
+    var keyCode = e.keyCode || e.which;
+    if (keyCode == '13'){
+      // Käyttäjä painaa enter-nappia
+		searchMovieData();
+      return false;
+    }
+  }
+		
+	</script>
+</body>
+</html>
