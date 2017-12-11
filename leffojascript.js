@@ -1,7 +1,8 @@
 /* Leffoja-sivuston JavaScript-ohjelmakoodi:
 Ohjelmalla haetaan kaikki Finnkinon nykyhetkessä tarjonnassa olevat elokuvat ja tapahtumat paikkakunta- sekä teatterikohtaisesti. Sivultamme löydät kaikkien tarjonnassa olevien elokuvien tarkempia tietoja, kuten julkaisuvuoden ja alkuperäisen nimen.
 Ohjelma käyttää Finnkinon XML-REST API-rajapintaa, josta dataa haetaan XML-muodossa, ja parsitaan AJAX-kutsujen avulla JavaScript-objektiksi.
-Otin sivustoon käyttöön BootStrap-frameworkin ulkoasua varten, koska se on mielestäni niin hyvä ja yksinkertainen ottaa käyttöön. */
+Otin sivustoon käyttöön BootStrap-frameworkin ulkoasua varten, koska se on mielestäni niin hyvä ja yksinkertainen ottaa käyttöön.
+Sivut toimivat oikein hyvin ja parhaiten Google Chrome-selaimella, koska se tukee parhaiten AJAX-kutsuja ja BootStrap-frameworkia. Täten suosittelen testaamaan sivuja Chromella. Firefox toimii jotenkin kohtalaisesti, mutta Internet Explorer ei toiminut itselläni ainakaan ollenkaan AJAX:in kanssa. Edge-selain toimi kohtalaisen hyvin.*/
 
 // Asetetaan sivun latautuessa taustakuva.
 function vaihdaTausta() {
